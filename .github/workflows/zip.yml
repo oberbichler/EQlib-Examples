@@ -1,0 +1,29 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Zip
+
+on:
+  push:
+    branches: [ "main" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Zip
+        run: zip -r examples.zip *.gh
+
+      - name: Commit
+        run: |
+          git config --global user.name 'oberbichler'
+          git config --global user.email 'oberbichler@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout "${GITHUB_REF:11}"
+          git add examples.zip
+          git commit -am "Update zip archive"
+          git push
